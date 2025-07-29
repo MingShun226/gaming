@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lucky Stars Casino</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 2.5em;
+            color: #ffd700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .subtitle {
+            color: #ccc;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 16px;
+            backdrop-filter: blur(5px);
+        }
+
+        input[type="text"]:focus, input[type="password"]:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        input::placeholder {
+            color: #bbb;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #1a1a2e;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error {
+            color: #ff6b6b;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .success {
+            color: #51cf66;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .loading {
+            color: #ffd700;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .dashboard {
+            display: none;
+        }
+
+        .welcome {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #ffd700;
+        }
+
+        .user-info {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .user-info div {
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .user-info .label {
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .game-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .game-card:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .game-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .logout-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ff5252);
+            margin-top: 20px;
+        }
+
+        .auto-fill-notice {
+            background: rgba(255, 215, 0, 0.2);
+            border: 1px solid #ffd700;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #ffd700;
+        }
+
+        .spinner {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #ffd700;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Form -->
+        <div id="loginForm">
+            <div class="logo">🎰 Lucky Stars</div>
+            <div class="subtitle">Premium Casino Experience</div>
+            
+            <div id="autoFillNotice" class="auto-fill-notice" style="display: none;">
+                🎉 Welcome! Your credentials have been auto-filled. Just click Login!
+            </div>
+
+            <form id="login">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Enter your username" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                </div>
+                
+                <button type="submit" id="loginBtn" class="btn">🎯 Login</button>
+                
+                <div id="loginMessage"></div>
+            </form>
+        </div>
+
+        <!-- Dashboard -->
+        <div id="dashboard" class="dashboard">
+            <div class="welcome">Welcome, <span id="welcomeUser"></span>!</div>
+            
+            <div class="user-info">
+                <div><span class="label">User ID:</span> <span id="userId"></span></div>
+                <div><span class="label">Login Count:</span> <span id="loginCount"></span></div>
+                <div><span class="label">Member Since:</span> <span id="memberSince"></span></div>
+                <div><span class="label">Last Login:</span> <span id="lastLogin"></span></div>
+            </div>
+            
+            <div class="subtitle">Choose your game</div>
+            
+            <div class="game-grid">
+                <div class="game-card" onclick="playGame('slots')">
+                    <div class="game-icon">🎰</div>
+                    <div>Slot Machines</div>
+                </div>
+                <div class="game-card" onclick="playGame('blackjack')">
+                    <div class="game-icon">🃏</div>
+                    <div>Blackjack</div>
+                </div>
+                <div class="game-card" onclick="playGame('poker')">
+                    <div class="game-icon">♠️</div>
+                    <div>Poker</div>
+                </div>
+                <div class="game-card" onclick="playGame('roulette')">
+                    <div class="game-icon">🎡</div>
+                    <div>Roulette</div>
+                </div>
+            </div>
+            
+            <button onclick="logout()" class="btn logout-btn">🚪 Logout</button>
+        </div>
+    </div>
+
+    <!-- Supabase JavaScript Client -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    
+    <script>
+        // ⚠️ CONFIGURE YOUR SUPABASE CREDENTIALS HERE
+        const SUPABASE_URL = 'https://mogacmcsxoqxnxftjquf.supabase.co'; // CHANGE THIS
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1vZ2FjbWNzeG9xeG54ZnRqcXVmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4MDk4MDQsImV4cCI6MjA2OTM4NTgwNH0.MzvlA8lsfO6FRLWMclw_J1OnV_ZmgCEyhgTnigSktsE'; // CHANGE THIS
+        
+        // Initialize Supabase client
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // Check for auto-fill parameters on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const autoUsername = urlParams.get('username');
+            const autoPassword = urlParams.get('password');
+            
+            if (autoUsername && autoPassword) {
+                document.getElementById('username').value = autoUsername;
+                document.getElementById('password').value = autoPassword;
+                document.getElementById('autoFillNotice').style.display = 'block';
+            }
+        });
+
+        // Login functionality with real Supabase authentication
+        document.getElementById('login').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const messageDiv = document.getElementById('loginMessage');
+            const loginBtn = document.getElementById('loginBtn');
+            
+            // Validation
+            if (!username || !password) {
+                showMessage('Please enter both username and password', 'error');
+                return;
+            }
+            
+            // Show loading state
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<span class="spinner"></span>Logging in...';
+            showMessage('Authenticating...', 'loading');
+            
+            try {
+                // Call Supabase function to authenticate user
+                const { data, error } = await supabase.rpc('authenticate_user', {
+                    username_input: username,
+                    password_input: password
+                });
+                
+                if (error) {
+                    throw error;
+                }
+                
+                if (data && data.length > 0) {
+                    const user = data[0];
+                    
+                    if (!user.is_active) {
+                        showMessage('❌ Account is deactivated. Please contact support.', 'error');
+                        return;
+                    }
+                    
+                    // Get additional user details
+                    const { data: userDetails, error: detailsError } = await supabase
+                        .from('casino_users')
+                        .select('created_at, last_login')
+                        .eq('username', username)
+                        .single();
+                    
+                    showMessage('✅ Login successful!', 'success');
+                    
+                    // Store user data
+                    const userData = {
+                        id: user.id,
+                        username: user.username,
+                        loginCount: user.login_count,
+                        createdAt: userDetails?.created_at,
+                        lastLogin: userDetails?.last_login
+                    };
+                    
+                    // Show dashboard
+                    setTimeout(() => {
+                        showDashboard(userData);
+                    }, 1000);
+                    
+                } else {
+                    showMessage('❌ Invalid username or password!', 'error');
+                }
+                
+            } catch (error) {
+                console.error('Login error:', error);
+                showMessage('❌ Login failed. Please try again.', 'error');
+            } finally {
+                // Reset button state
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = '🎯 Login';
+            }
+        });
+        
+        // Show dashboard with user data
+        function showDashboard(userData) {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            
+            // Populate user information
+            document.getElementById('welcomeUser').textContent = userData.username;
+            document.getElementById('userId').textContent = userData.id.split('-')[0] + '...';
+            document.getElementById('loginCount').textContent = userData.loginCount || 0;
+            
+            // Format dates
+            if (userData.createdAt) {
+                const createdDate = new Date(userData.createdAt);
+                document.getElementById('memberSince').textContent = createdDate.toLocaleDateString();
+            }
+            
+            if (userData.lastLogin) {
+                const lastLoginDate = new Date(userData.lastLogin);
+                document.getElementById('lastLogin').textContent = lastLoginDate.toLocaleString();
+            } else {
+                document.getElementById('lastLogin').textContent = 'First login!';
+            }
+        }
+        
+        // Helper function to show messages
+        function showMessage(message, type) {
+            const messageDiv = document.getElementById('loginMessage');
+            messageDiv.innerHTML = `<div class="${type}">${message}</div>`;
+        }
+
+        // Game functions
+        function playGame(gameType) {
+            const games = {
+                'slots': '🎰 Spinning the reels...',
+                'blackjack': '🃏 Dealing cards...',
+                'poker': '♠️ Shuffling deck...',
+                'roulette': '🎡 Spinning the wheel...'
+            };
+            
+            alert(games[gameType] + '\n\n🎮 Game loading... (Demo mode)\n\n🚀 In the full version, this would launch the actual game!');
+        }
+
+        // Logout function
+        function logout() {
+            // Clear any stored data
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('loginMessage').innerHTML = '';
+            document.getElementById('autoFillNotice').style.display = 'none';
+            
+            // Clear URL parameters
+            window.history.replaceState({}, document.title, window.location.pathname);
+            
+            showMessage('👋 Logged out successfully', 'success');
+        }
+
+        // Expose API for external testing (optional)
+        window.casinoAPI = {
+            testConnection: async function() {
+                try {
+                    const { data, error } = await supabase.rpc('check_username_exists', {
+                        username_to_check: 'test'
+                    });
+                    
+                    return { success: !error, data, error };
+                } catch (err) {
+                    return { success: false, error: err.message };
+                }
+            },
+            
+            generateLoginUrl: function(username, password) {
+                return `${window.location.origin}${window.location.pathname}?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`;
+            }
+        };
+        
+        // Test connection on load (optional)
+        window.addEventListener('load', async function() {
+            try {
+                const result = await window.casinoAPI.testConnection();
+                if (result.success) {
+                    console.log('✅ Supabase connection successful');
+                } else {
+                    console.error('❌ Supabase connection failed:', result.error);
+                }
+            } catch (error) {
+                console.error('❌ Failed to test Supabase connection:', error);
+            }
+        });
+    </script>
+</body>
+</html>
