@@ -287,16 +287,60 @@
         // Initialize Supabase client
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
+        // Decryption function to match the encryption in n8n
+        function decryptPassword(encryptedPassword) {
+            try {
+                // Step 1: Base64 decode
+                const step1 = atob(encryptedPassword);
+                
+                // Step 2: Reverse Caesar cipher (shift back by 3)
+                let decrypted = '';
+                for (let i = 0; i < step1.length; i++) {
+                    let char = step1.charCodeAt(i);
+                    // Reverse shift for printable ASCII characters
+                    if (char >= 32 && char <= 126) {
+                        char = ((char - 32 - 3 + 95) % 95) + 32;
+                    }
+                    decrypted += String.fromCharCode(char);
+                }
+                
+                // Step 3: Base64 decode again to get original password
+                return atob(decrypted);
+            } catch (error) {
+                console.error('Decryption error:', error);
+                return null;
+            }
+        }
+        
         // Check for auto-fill parameters on page load
         window.addEventListener('DOMContentLoaded', function() {
             const urlParams = new URLSearchParams(window.location.search);
             const autoUsername = urlParams.get('username');
-            const autoPassword = urlParams.get('password');
+            const encryptedToken = urlParams.get('token');
+            const legacyPassword = urlParams.get('password'); // Fallback for old links
             
-            if (autoUsername && autoPassword) {
-                document.getElementById('username').value = autoUsername;
-                document.getElementById('password').value = autoPassword;
-                document.getElementById('autoFillNotice').style.display = 'block';
+            if (autoUsername && (encryptedToken || legacyPassword)) {
+                let autoPassword = null;
+                
+                if (encryptedToken) {
+                    // Decrypt the password from the token
+                    autoPassword = decryptPassword(encryptedToken);
+                    console.log('🔓 Password decrypted from secure token');
+                } else if (legacyPassword) {
+                    // Fallback for old non-encrypted links
+                    autoPassword = legacyPassword;
+                    console.log('⚠️ Using legacy password parameter');
+                }
+                
+                if (autoPassword) {
+                    document.getElementById('username').value = autoUsername;
+                    document.getElementById('password').value = autoPassword;
+                    document.getElementById('autoFillNotice').style.display = 'block';
+                    console.log('✅ Auto-fill successful');
+                } else {
+                    console.error('❌ Failed to decrypt password');
+                    showMessage('🔒 Invalid secure link. Please enter credentials manually.', 'error');
+                }
             }
         });
 
@@ -450,6 +494,13 @@
             
             generateLoginUrl: function(username, password) {
                 return `${window.location.origin}${window.location.pathname}?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`;
+            },
+            
+            // New function to test encryption/decryption
+            testEncryption: function(password) {
+                // This would need the encryption function from your n8n node
+                console.log('Original:', password);
+                // For testing, you'd need to implement the encryption here too
             }
         };
         
